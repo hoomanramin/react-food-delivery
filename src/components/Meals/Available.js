@@ -36,7 +36,8 @@ const Available = props => {
           {DUMMY_MEALS.map(meal => {
             return (
               <MealItem
-                key={meal.key}
+                id={meal.id}
+                key={meal.id}
                 name={meal.name}
                 description={meal.description}
                 price={meal.price}
