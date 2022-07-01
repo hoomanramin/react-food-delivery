@@ -1,39 +1,53 @@
+import { useEffect, useState } from "react";
 import Card from "../UI/Card";
 import classes from "./Available.module.css";
 import MealItem from "./MealItem/MealItem";
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
 
-const Available = props => {
+const Available = (props) => {
+  const [meals, setMeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState();
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch(
+        "https://react-request-974a4-default-rtdb.firebaseio.com/meals.json"
+      );
+      if (!res.ok) {
+        throw new Error("Can not connect to server");
+      }
+      const resData = await res.json();
+
+      let loadedData = [];
+      for (const key in resData) {
+        loadedData.push({
+          id: key,
+          name: resData[key].name,
+          description: resData[key].description,
+          price: resData[key].price,
+        });
+      }
+      setIsLoading(false);
+      setMeals(loadedData);
+    };
+
+    fetchData().catch((error) => {
+      setIsLoading(false);
+      setError(error.message);
+    });
+  }, []);
+
+  if (isLoading) {
+    return <p style={{ color: "white", textAlign: "center" }}>...Loading</p>;
+  }
+  if (error) {
+    return <p style={{ color: "red", textAlign: "center" }}>{error}</p>;
+  }
+
   return (
     <section className={classes.meals}>
       <Card>
         <ul>
-          {DUMMY_MEALS.map(meal => {
+          {meals.map((meal) => {
             return (
               <MealItem
                 id={meal.id}
